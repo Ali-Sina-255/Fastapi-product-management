@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, HTTPException, Depends
-from sqlmodel import Session
-from apps.product.models import Item as DBItem  # Database model
+from sqlmodel import Session, select
+from apps.product.models import Item as DBItem
 from apps.product.schema import ResponseSchema, ItemCreate
 from apps.core.db import get_session
 from typing import Union
@@ -58,3 +58,30 @@ def get_items(session: Session = Depends(get_session), skip: int = 0, limit: int
         )
         for item in items
     ]
+
+
+@router.get("/{id}", response_model=ResponseSchema)
+def get_item(id: int, session: Session = Depends(get_session)):
+    statement = select(DBItem).where(DBItem.id == id)
+    item = session.exec(statement).first()
+
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Item with id {id} not found"
+        )
+
+    return ResponseSchema(
+        message="Item retrieved successfully",
+        data=(
+            item.dict()
+            if hasattr(item, "dict")
+            else {
+                "id": item.id,
+                "name": item.name,
+                "description": item.description,
+                "price": item.price,
+            }
+        ),
+        status_code=status.HTTP_200_OK,
+        success=True,
+    )
