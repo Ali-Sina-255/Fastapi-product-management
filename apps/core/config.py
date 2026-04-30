@@ -18,6 +18,13 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = ""
     PROJECT_DESCRIPTION: str = ""
     SITE_NAME: str = ""
+    # database settings
+    DATABASE_URL: str
+
+    @property
+    def DATABASE_URL(self):
+        if self.DATABASE_URL:
+            return self.DATABASE_URL
 
 
 settings = Settings()

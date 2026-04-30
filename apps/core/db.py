@@ -1,5 +1,6 @@
 from apps.core.logging import get_logger
 from sqlmodel import create_engine, Session, SQLModel
+import psycopg2
 
 logger = get_logger()
 sqlite_file_name = "database.db"
